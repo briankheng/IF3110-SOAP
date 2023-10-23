@@ -1,6 +1,6 @@
 import utils.ConfigHandler;
 
-import javax.xml.ws.Endpoint;
+// import javax.xml.ws.Endpoint;
 
 public class App {
     private final static String SERVER_HOST_KEY = "server.host";
