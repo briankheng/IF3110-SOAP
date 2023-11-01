@@ -8,6 +8,6 @@ public class TestingService {
     
     @WebMethod
     public String HelloWorld (String name) {
-        return "Hello" + name;
+        return "Hello " + name;
     }
 }

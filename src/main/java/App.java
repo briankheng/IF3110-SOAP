@@ -14,6 +14,7 @@ public class App {
 
             System.out.println("Starting server at " + host + ":" + port);
             Endpoint.publish(host+":"+port+"/webservices/testing", new webservices.TestingService());
+            Endpoint.publish(host+":"+port+"/webservices/subscription", new webservices.SubscriptionService());
             System.out.println("Server started at " + host + ":" + port);
         } catch (Exception e) {
             e.printStackTrace();
