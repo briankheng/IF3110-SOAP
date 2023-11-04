@@ -41,4 +41,17 @@ public class Subscription extends ModelInterface {
         this.albumId = rs.getInt("album_id");
         this.status = Subscription.SubscriptionStatus.fromStatusCode(rs.getString("status"));
     }
+
+    public Integer getUserId() {
+        return this.userId;    
+    }
+
+    public Integer getAlbumId() {
+        return this.albumId;
+    }
+
+    public Subscription.SubscriptionStatus getStatus() {
+        return this.status;
+    }
+
 }

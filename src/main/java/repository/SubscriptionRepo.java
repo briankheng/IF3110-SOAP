@@ -42,19 +42,24 @@ public class SubscriptionRepo extends RepoInterface<Subscription> {
 
     public Subscription findById(int userId, int albumId) {
         try {
-            Subscription result = new Subscription();
-
             Statement stmt = this.db.getConnection().createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM " + this.tableName + " WHERE user_id = " + userId + " AND album_id = " + albumId + " LIMIT 1");
-            rs.next();
-            result.constructFromSQL(rs);
-            return result;
-
+    
+            if (rs.next()) {
+                // If a result is found, construct a Subscription object and return it
+                Subscription result = new Subscription();
+                result.constructFromSQL(rs);
+                return result;
+            }
+    
+            // No matching subscription found
+            return null;
+    
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-    }
+    }    
 
     @Override
     public Subscription create(Subscription subscription) throws SQLException {
@@ -69,6 +74,8 @@ public class SubscriptionRepo extends RepoInterface<Subscription> {
     @Override
     public Subscription update(Subscription subscription) throws SQLException {
         Statement stmt = this.db.getConnection().createStatement();
+        System.out.println(subscription.getStatus());
+        System.out.println("UPDATE " + this.tableName + " SET status = '" + subscription.getStatus().toString() + "' WHERE user_id = " + subscription.getUserId() + " AND album_id = " + subscription.getAlbumId());
         int rs = stmt.executeUpdate(
             "UPDATE " + this.tableName + 
             " SET status = '" + subscription.getStatus().toString() + 

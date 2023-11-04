@@ -1,6 +1,5 @@
 package webservices;
 
-import com.sun.net.httpserver.HttpExchange;
 import lombok.var;
 import models.ApiKey;
 import models.Logging;
@@ -15,11 +14,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.sql.Timestamp;
+/* import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse; */
 
 public abstract class AbstractWebservices {
     @Resource
     WebServiceContext context;
-    private final String httpExchangeKey = "com.sun.xml.internal.ws.http.exchange";
 
     protected void recordClient(String endpoint, String description, String ipAddr) throws SQLException {
         System.out.println("Client " + ipAddr + " called " + endpoint + " with description: " + description);
@@ -30,18 +30,26 @@ public abstract class AbstractWebservices {
         Logging log = LoggingRepo.getInstance().create(model);
     }
 
-    private String getRemoteAddr() {
-        MessageContext mc = context.getMessageContext();
-        HttpExchange httpExchange = (HttpExchange) mc.get(this.httpExchangeKey);
-        System.out.println("remote addr: " + httpExchange.getRemoteAddress());
+    /* private String getRemoteAddr() {
+        HttpServletRequest request = (HttpServletRequest) context.getMessageContext().get(MessageContext.SERVLET_REQUEST);
+        HttpServletResponse response = (HttpServletResponse) context.getMessageContext().get(MessageContext.SERVLET_RESPONSE);
 
-        return httpExchange.getRemoteAddress().toString().replace("/", "");
-    }
+        if (request != null) {
+            System.out.println(request);
+            System.out.println(response);
+            String remoteAddr = request.getRemoteAddr();
+            System.out.println("Remote Address: " + remoteAddr);
+            return remoteAddr;
+        } else {
+            System.out.println("HttpServletRequest not available1111.");
+            return "Unknown";
+        }
+    } */
 
     protected String getClientByApiKey() throws Exception {
         MessageContext mc = context.getMessageContext();
-        Map<String, Object> requestHeader = (Map) mc.get(mc.HTTP_REQUEST_HEADERS);
-        String apiKey = ((List<String>) requestHeader.get("api-key")).get(0);
+        Map<String, List<String>> requestHeader = (Map) mc.get(MessageContext.HTTP_REQUEST_HEADERS);
+        String apiKey = requestHeader.get("api-key").get(0);
         System.out.println("api key: " + apiKey);
 
         List<ApiKey> validApiKeys = ApiKeyRepo.getInstance().findAll();
@@ -53,15 +61,31 @@ public abstract class AbstractWebservices {
         throw new Exception("Invalid API key");
     }
 
-    protected void validateAndRecord(Object ...params) throws Exception {
+    protected void validateAndRecord(Object... params) throws Exception {
         String client = this.getClientByApiKey();
         var ptrTrace = Thread.currentThread().getStackTrace()[2];
         String endpoint = ptrTrace.getClassName() + "." + ptrTrace.getMethodName();
+        
+        // Check if params is not empty
+        if (params.length > 0) {
+            // Extract the last parameter from the array
+            Object lastParam = params[params.length - 1];
+            
+            // Remove the last parameter from the params array
+            Object[] paramsWithoutLast = new Object[params.length - 1];
+            System.arraycopy(params, 0, paramsWithoutLast, 0, paramsWithoutLast.length);
+            
+            // Store the rest of the parameters in buildDesc
+            String buildDesc = buildDesc(client, paramsWithoutLast);
+    
+            // Use the lastParam instead of this.getRemoteAddr()
+            String remoteAddr = lastParam.toString();
+    
+            this.recordClient(endpoint, buildDesc, remoteAddr);
+        }
+    }    
 
-        this.recordClient(endpoint, buildDesc(client, params), this.getRemoteAddr());
-    }
-
-    private String buildDesc(String client, Object ...params) {
+    private String buildDesc(String client, Object... params) {
         String paramsStr = Arrays.stream(params)
                 .map(e -> "[" + e + "]")
                 .reduce((a, b) -> a + "," + b)

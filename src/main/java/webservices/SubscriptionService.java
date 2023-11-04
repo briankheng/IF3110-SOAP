@@ -1,6 +1,5 @@
 package webservices;
 
-import clients.KBLRestClient;
 import lombok.var;
 import models.Subscription;
 import repository.SubscriptionRepo;
@@ -15,13 +14,24 @@ import java.util.stream.Collectors;
 @WebService
 public class SubscriptionService extends AbstractWebservices implements SubscriptionInterface {
     @WebMethod
-    public Subscription subscribe(int user_id, int album_id) {
+    public Subscription subscribe(int user_id, int album_id, String ipAddress) {
         try {
-            this.validateAndRecord(user_id, album_id);
+            Subscription existingSubscription = SubscriptionRepo.getInstance().findById(user_id, album_id);
+            System.out.println(existingSubscription);
 
-            Subscription model = new Subscription(user_id, album_id, null);
-            var result = SubscriptionRepo.getInstance().create(model);
-            return result;
+            if (existingSubscription != null) {
+                // Subscription already exists, update it
+                this.validateAndRecord(user_id, album_id, ipAddress);
+                Subscription model = new Subscription(user_id, album_id, Subscription.SubscriptionStatus.PENDING);
+                var result = SubscriptionRepo.getInstance().update(model);
+                return result;
+            } else {
+                // Subscription doesn't exist, create a new one
+                this.validateAndRecord(user_id, album_id, ipAddress);
+                Subscription newSubscription = new Subscription(user_id, album_id, Subscription.SubscriptionStatus.PENDING);
+                var createdSubscription = SubscriptionRepo.getInstance().create(newSubscription);
+                return createdSubscription;
+            }
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
             e.printStackTrace();
@@ -30,15 +40,12 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     }
 
     @WebMethod
-    public Subscription acceptSubscription(int user_id, int album_id) {
+    public Subscription acceptSubscription(int user_id, int album_id, String ipAddress) {
         try {
-            this.validateAndRecord(user_id, album_id);
+            this.validateAndRecord(user_id, album_id, ipAddress);
 
             Subscription model = new Subscription(user_id, album_id, Subscription.SubscriptionStatus.ACCEPTED);
             var result = SubscriptionRepo.getInstance().update(model);
-            var httpResult = KBLRestClient.getInstance().callback(result);
-            System.out.println("http result: " + httpResult);
-
             return result;
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
@@ -48,14 +55,12 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     }
 
     @WebMethod
-    public Subscription rejectSubscription(int user_id, int album_id) {
+    public Subscription rejectSubscription(int user_id, int album_id, String ipAddress) {
         try {
-            this.validateAndRecord(user_id, album_id);
+            this.validateAndRecord(user_id, album_id, ipAddress);
 
             Subscription model = new Subscription(user_id, album_id, Subscription.SubscriptionStatus.REJECTED);
             var result = SubscriptionRepo.getInstance().update(model);
-            KBLRestClient.getInstance().callback(result);
-
             return result;
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
@@ -65,9 +70,9 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     }
 
     @WebMethod
-    public List<Subscription> getSubscriptions() {
+    public List<Subscription> getSubscriptions(String ipAddress) {
         try {
-            this.validateAndRecord();
+            this.validateAndRecord(ipAddress);
             return SubscriptionRepo.getInstance().findAll();
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
@@ -77,9 +82,9 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     }
 
     @WebMethod
-    public List<Subscription> checkStatus(String userIds, String albumIds) {
+    public List<Subscription> checkStatus(String userIds, String albumIds, String ipAddress) {
         try {
-            this.validateAndRecord(userIds, albumIds);
+            this.validateAndRecord(userIds, albumIds, ipAddress);
             List<Integer> intuserIds = Arrays
                     .stream(userIds.split(","))
                     .map(Integer::parseInt)
@@ -105,9 +110,9 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     }
 
     @WebMethod
-    public List<Subscription> getByStatus(Subscription.SubscriptionStatus status) {
+    public List<Subscription> getByStatus(Subscription.SubscriptionStatus status, String ipAddress) {
         try {
-            this.validateAndRecord(status);
+            this.validateAndRecord(status, ipAddress);
             return SubscriptionRepo.getInstance().findByStatus(status);
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());

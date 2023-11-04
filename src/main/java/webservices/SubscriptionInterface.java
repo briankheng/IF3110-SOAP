@@ -9,20 +9,20 @@ import java.util.List;
 @WebService
 public interface SubscriptionInterface {
     @WebMethod
-    public Subscription subscribe(int creator_id, int subscriber_id);
+    public Subscription subscribe(int user_id, int album_id, String ipAddress);
 
     @WebMethod
-    public Subscription acceptSubscription(int creator_id, int subscriber_id);
+    public Subscription acceptSubscription(int user_id, int album_id, String ipAddress);
 
     @WebMethod
-    public Subscription rejectSubscription(int creator_id, int subscriber_id);
+    public Subscription rejectSubscription(int user_id, int album_id, String ipAddress);
 
     @WebMethod
-    public List<Subscription> getSubscriptions();
+    public List<Subscription> getSubscriptions(String ipAddress);
 
     @WebMethod
-    public List<Subscription> checkStatus(String creatorIds, String subscriberIds);
+    public List<Subscription> checkStatus(String userIds, String albumIds, String ipAddress);
 
     @WebMethod
-    public List<Subscription> getByStatus(Subscription.SubscriptionStatus status);
+    public List<Subscription> getByStatus(Subscription.SubscriptionStatus status, String ipAddress);
 }
