@@ -59,7 +59,31 @@ public class SubscriptionRepo extends RepoInterface<Subscription> {
             e.printStackTrace();
             return null;
         }
-    }    
+    }
+
+    public List<Integer> findUserByAlbumId(int albumId) {
+        List<Integer> userIds = new ArrayList<>();
+
+        try {
+            Statement stmt = this.db.getConnection().createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT DISTINCT user_id FROM " + this.tableName + " WHERE album_id = " + albumId);
+    
+            if (rs.next()) {
+                // Add each user_id to the list
+                int userId = rs.getInt("user_id");
+                userIds.add(userId);
+            }
+    
+            // Close the ResultSet and Statement to free up resources
+            rs.close();
+            stmt.close();
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return userIds.isEmpty() ? null : userIds;
+    }     
 
     @Override
     public Subscription create(Subscription subscription) throws SQLException {

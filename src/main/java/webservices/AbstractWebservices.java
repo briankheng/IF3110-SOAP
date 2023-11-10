@@ -14,8 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.sql.Timestamp;
-/* import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse; */
 
 public abstract class AbstractWebservices {
     @Resource
@@ -29,22 +27,6 @@ public abstract class AbstractWebservices {
         Logging model = new Logging(description, ipAddr, endpoint, s);
         Logging log = LoggingRepo.getInstance().create(model);
     }
-
-    /* private String getRemoteAddr() {
-        HttpServletRequest request = (HttpServletRequest) context.getMessageContext().get(MessageContext.SERVLET_REQUEST);
-        HttpServletResponse response = (HttpServletResponse) context.getMessageContext().get(MessageContext.SERVLET_RESPONSE);
-
-        if (request != null) {
-            System.out.println(request);
-            System.out.println(response);
-            String remoteAddr = request.getRemoteAddr();
-            System.out.println("Remote Address: " + remoteAddr);
-            return remoteAddr;
-        } else {
-            System.out.println("HttpServletRequest not available1111.");
-            return "Unknown";
-        }
-    } */
 
     protected String getClientByApiKey() throws Exception {
         MessageContext mc = context.getMessageContext();

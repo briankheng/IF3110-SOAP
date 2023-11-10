@@ -6,6 +6,9 @@ import repository.SubscriptionRepo;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+
+import clients.KBLRestClient;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -118,6 +121,29 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
             System.out.println("exception: " + e.getMessage());
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @WebMethod
+    public void notifySubscriber(int album_id, String ipAddress) {
+        try {
+            System.out.println(album_id);
+            System.out.println(ipAddress);
+            //haha
+            //gimana
+            this.validateAndRecord(album_id, ipAddress);
+            // Get all the user ids of subscribed album
+            List<Integer> userIds = SubscriptionRepo.getInstance().findUserByAlbumId(album_id);
+            // Get all the user emails based on user ids
+            String[] emails = KBLRestClient.getInstance().getUserEmails(userIds);
+            // Notify by sending emails to them
+            for (int i = 0; i < emails.length; i++) {
+                System.out.println(emails[i]);
+            }
+
+        } catch (Exception e) {
+            System.out.println("exception: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

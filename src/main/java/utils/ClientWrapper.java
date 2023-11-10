@@ -51,7 +51,8 @@ public class ClientWrapper {
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .reduce((a, b) -> a + "&" + b)
                 .orElse("");
-        return this.url + endpoint + "?" + paramsStr;
+        System.out.println(endpoint + "?" + paramsStr);
+        return endpoint + "?" + paramsStr;
     }
 
     private UrlEncodedFormEntity buildParamsBodyReq(Map<String, String> params) {
@@ -68,7 +69,9 @@ public class ClientWrapper {
 
     public Result get(Map<String, String> params) {
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet(buildUrl(this.url, params));
+            String fullUrl = buildUrl(this.url, params);
+            System.out.println("-" + fullUrl);
+            HttpGet httpGet = new HttpGet(fullUrl);
             System.out.println("Sending get req to " + httpGet.getPath());
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
                 StatusLine statusLine = new StatusLine(response);
@@ -76,9 +79,11 @@ public class ClientWrapper {
                 String body = EntityUtils.toString(entity);
                 return new Result(statusLine.getStatusCode(), body);
             } catch (ParseException e) {
+                System.out.println("Failed executing");
                 throw new RuntimeException(e);
             }
         } catch (IOException e) {
+            System.out.println("Failed init HttpGet");
             e.printStackTrace();
         }
         return null;

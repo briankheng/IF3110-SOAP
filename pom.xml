@@ -15,6 +15,13 @@
             <version>1.5.5</version>
         </dependency>
 
+        <!-- SLF4J API -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.32</version>
+        </dependency>
+
         <!-- Lombok annotation -->
         <dependency>
             <groupId>org.projectlombok</groupId>
