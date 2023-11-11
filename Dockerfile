@@ -1,10 +1,9 @@
 FROM openjdk:8
 
-WORKDIR /app
+COPY ./target /app
 
-# Copy the JAR file into the container
-COPY ./target/service_soap-jar-with-dependencies.jar app.jar
+WORKDIR /app
 
 EXPOSE 3003
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "service_soap-jar-with-dependencies.jar"]
