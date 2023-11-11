@@ -1,36 +1,38 @@
 package utils;
 
 import lombok.Getter;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.ParseException;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.message.BasicNameValuePair;
-import org.apache.hc.core5.http.message.StatusLine;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import com.google.gson.Gson;
 
+@Getter
 public class ClientWrapper {
     private String url;
+
     public ClientWrapper(String url) {
         this.url = url;
     }
 
-    @Getter
     public static class Result {
-        final int status;
-        final String content;
+        private final int status;
+        private final String content;
 
-        Result(final int status, final String content) {
+        public Result(int status, String content) {
             this.status = status;
             this.content = content;
+        }
+
+        public String getContent() {
+            return this.content;
+        }
+
+        public int getStatus() {
+            return this.status;
         }
 
         @Override
@@ -42,76 +44,80 @@ public class ClientWrapper {
         }
     }
 
-    private String buildUrl(String endpoint, Map<String, String> params) {
-        if (params == null || params.isEmpty() || params.size() == 0) {
-            return endpoint;
+    public static class Response {
+        private String message;
+        private String[] data;
+
+        public String getMessage() {
+            return this.message;
         }
 
-        String paramsStr = params.entrySet().stream()
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                .reduce((a, b) -> a + "&" + b)
-                .orElse("");
-        System.out.println(endpoint + "?" + paramsStr);
-        return endpoint + "?" + paramsStr;
-    }
-
-    private UrlEncodedFormEntity buildParamsBodyReq(Map<String, String> params) {
-        List<NameValuePair> nameValuePairs = new ArrayList<>();
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+        public String[] getData() {
+            return this.data;
         }
-        return new UrlEncodedFormEntity(nameValuePairs);
+
+        @Override
+        public String toString() {
+            return "Response{" +
+                    "message='" + message + '\'' +
+                    ", data=" + Arrays.toString(data) +
+                    '}';
+        }
     }
 
-    public Result get() {
-        return this.get(new HashMap<>());
+    public Result get(String restEndpoint, Map<String, String> queryParams) throws Exception {
+        // Build url, based on query params
+        String fullUrl = buildUrl(this.url + restEndpoint, queryParams);
+
+        // Make httpget request
+        URL restUrl = new URL(fullUrl);
+        HttpURLConnection connection = (HttpURLConnection) restUrl.openConnection();
+        connection.setRequestMethod("GET");
+
+        // Process REST Response
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String line;
+        StringBuilder response = new StringBuilder();
+
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
+        }
+        reader.close();
+
+        // Close HttpURLConnection
+        connection.disconnect();
+        String fullResp = response.toString();
+
+        // Parsing the response
+        Result parsedResult = parseResponse(fullResp);
+        return parsedResult;
     }
 
-    public Result get(Map<String, String> params) {
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            String fullUrl = buildUrl(this.url, params);
-            System.out.println("-" + fullUrl);
-            HttpGet httpGet = new HttpGet(fullUrl);
-            System.out.println("Sending get req to " + httpGet.getPath());
-            try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
-                StatusLine statusLine = new StatusLine(response);
-                HttpEntity entity = response.getEntity();
-                String body = EntityUtils.toString(entity);
-                return new Result(statusLine.getStatusCode(), body);
-            } catch (ParseException e) {
-                System.out.println("Failed executing");
-                throw new RuntimeException(e);
+    private ClientWrapper.Result parseResponse(String jsonResponse) {
+        try {
+            Gson gson = new Gson();
+            Response response = gson.fromJson(jsonResponse, Response.class);
+
+            // Sent it finals
+            if (response.getMessage().equals("OK")) {
+                return new Result(200, String.join(",", response.getData()));
             }
-        } catch (IOException e) {
-            System.out.println("Failed init HttpGet");
+        } catch (Exception e) {
+            // Handle Gson exceptions or other parsing errors
             e.printStackTrace();
+            return new Result(-1, "Error parsing response");
         }
         return null;
     }
 
-    public Result post() {
-        return this.post(new HashMap<>());
-    }
-
-    public Result post(Map<String, String> params) {
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            HttpPost httpPost = new HttpPost(this.url);
-            httpPost.setEntity(buildParamsBodyReq(params));
-            try (CloseableHttpResponse response = httpclient.execute(httpPost)) {
-                StatusLine statusLine = new StatusLine(response);
-                HttpEntity entity = response.getEntity();
-                String body = EntityUtils.toString(entity);
-                return new Result(statusLine.getStatusCode(), body);
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
+    private String buildUrl(String baseUrl, Map<String, String> queryParams) {
+        StringBuilder urlBuilder = new StringBuilder(baseUrl);
+        if (queryParams != null && !queryParams.isEmpty()) {
+            urlBuilder.append("?");
+            for (Map.Entry<String, String> entry : queryParams.entrySet()) {
+                urlBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return null;
-    }
-
-    public static void main(String[] args) throws Exception {
-        System.out.println("Wrapper on the way!");
+        return urlBuilder.toString();
     }
 }

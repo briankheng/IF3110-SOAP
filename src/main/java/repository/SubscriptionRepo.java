@@ -68,7 +68,7 @@ public class SubscriptionRepo extends RepoInterface<Subscription> {
             Statement stmt = this.db.getConnection().createStatement();
             ResultSet rs = stmt.executeQuery("SELECT DISTINCT user_id FROM " + this.tableName + " WHERE album_id = " + albumId);
     
-            if (rs.next()) {
+            while (rs.next()) {
                 // Add each user_id to the list
                 int userId = rs.getInt("user_id");
                 userIds.add(userId);
@@ -98,8 +98,6 @@ public class SubscriptionRepo extends RepoInterface<Subscription> {
     @Override
     public Subscription update(Subscription subscription) throws SQLException {
         Statement stmt = this.db.getConnection().createStatement();
-        System.out.println(subscription.getStatus());
-        System.out.println("UPDATE " + this.tableName + " SET status = '" + subscription.getStatus().toString() + "' WHERE user_id = " + subscription.getUserId() + " AND album_id = " + subscription.getAlbumId());
         int rs = stmt.executeUpdate(
             "UPDATE " + this.tableName + 
             " SET status = '" + subscription.getStatus().toString() + 

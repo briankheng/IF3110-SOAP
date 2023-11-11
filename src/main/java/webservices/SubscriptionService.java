@@ -127,10 +127,6 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     @WebMethod
     public void notifySubscriber(int album_id, String ipAddress) {
         try {
-            System.out.println(album_id);
-            System.out.println(ipAddress);
-            //haha
-            //gimana
             this.validateAndRecord(album_id, ipAddress);
             // Get all the user ids of subscribed album
             List<Integer> userIds = SubscriptionRepo.getInstance().findUserByAlbumId(album_id);
