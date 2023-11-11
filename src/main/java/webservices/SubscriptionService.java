@@ -3,9 +3,11 @@ package webservices;
 import lombok.var;
 import models.Subscription;
 import repository.SubscriptionRepo;
+import utils.EmailUtil;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;
+import javax.mail.internet.AddressException;
 
 import clients.KBLRestClient;
 
@@ -125,7 +127,7 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     }
 
     @WebMethod
-    public void notifySubscriber(int album_id, String ipAddress) {
+    public void notifySubscriber(int album_id, String album_name, String ipAddress) {
         try {
             this.validateAndRecord(album_id, ipAddress);
             // Get all the user ids of subscribed album
@@ -134,7 +136,15 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
             String[] emails = KBLRestClient.getInstance().getUserEmails(userIds);
             // Notify by sending emails to them
             for (int i = 0; i < emails.length; i++) {
-                System.out.println(emails[i]);
+                try {
+                    System.out.println("Sending email to " + emails[i]);
+                    EmailUtil.getInstance().send(emails[i], "New Video is Recently Uploaded!",
+                    "There is new video from your subscribed album, " + album_name + ", Go check it out!");
+                    System.out.println("Successfully send email to " + emails[i]);
+                } catch (AddressException ex) {
+                    System.out.println("Failed to send email to " + emails[i]);
+                    ex.printStackTrace();
+                }
             }
 
         } catch (Exception e) {
