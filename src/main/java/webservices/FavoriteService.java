@@ -26,21 +26,6 @@ public class FavoriteService extends AbstractWebservices implements FavoriteInte
     }
 
     @WebMethod
-    public boolean isFavorite(int user_id, int album_id, String ipAddress) {
-        try {
-            this.validateAndRecord(user_id, album_id, ipAddress);
-
-            Favorite favorite = new Favorite(user_id, album_id);
-            boolean result = FavoriteRepo.getInstance().find(favorite);
-            return result;
-        } catch (Exception e) {
-            System.out.println("exception: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    @WebMethod
     public Favorite addFavorite(int user_id, int album_id, String ipAddress) {
         try {
             this.validateAndRecord(user_id, album_id, ipAddress);
