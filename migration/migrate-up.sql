@@ -22,3 +22,8 @@ CREATE TABLE `subscriptions` (
   `album_id` int NOT NULL,
   `status` enum('PENDING','REJECTED','ACCEPTED') NOT NULL DEFAULT 'PENDING'
 );
+
+CREATE TABLE `favorites` (
+  `user_id` int NOT NULL,
+  `album_id` int NOT NULL
+);
