@@ -25,16 +25,4 @@ public class Token extends ModelInterface {
         this.tokenString = rs.getString("token_string");
         this.coinValue = rs.getInt("coin_value");
     }
-
-    public Integer getTokenId() {
-        return this.tokenId;    
-    }
-
-    public String getTokenString() {
-        return this.tokenString;
-    }
-
-    public Integer getCoinValue() {
-        return this.coinValue;
-    }
 }
