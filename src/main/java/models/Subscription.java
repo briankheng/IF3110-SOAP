@@ -54,4 +54,12 @@ public class Subscription extends ModelInterface {
         return this.status;
     }
 
+    @Override
+    public String toString() {
+        return "Subscription{" +
+                "userId=" + this.userId +
+                ", albumId='" + this.albumId +
+                ", status='" + this.status + '\'' +
+                '}';
+    }
 }

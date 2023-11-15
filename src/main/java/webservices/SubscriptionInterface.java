@@ -18,11 +18,8 @@ public interface SubscriptionInterface {
     public Subscription rejectSubscription(int user_id, int album_id, String ipAddress);
 
     @WebMethod
-    public List<Subscription> getSubscriptions(String ipAddress);
+    public Subscription verifySubscription(int user_id, int album_id, String ipAddress);
 
     @WebMethod
-    public List<Subscription> checkStatus(String userIds, String albumIds, String ipAddress);
-
-    @WebMethod
-    public List<Subscription> getByStatus(Subscription.SubscriptionStatus status, String ipAddress);
+    public void notifySubscriber(int album_id, String album_name, String ipAddress);
 }

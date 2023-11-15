@@ -1,9 +1,14 @@
-FROM openjdk:8
-
-COPY ./target /app
+FROM maven:3.8.4-openjdk-8
 
 WORKDIR /app
 
+# Copy only the necessary files to leverage Docker cache
+COPY pom.xml .
+COPY src ./src
+
+# Build the application
+RUN mvn clean install
+
 EXPOSE 3003
 
-ENTRYPOINT ["java", "-jar", "service_soap-jar-with-dependencies.jar"]
+ENTRYPOINT ["java", "-jar", "target/service_soap-jar-with-dependencies.jar"]

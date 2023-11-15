@@ -1,7 +1,9 @@
 package webservices;
 
 import lombok.var;
+import models.Favorite;
 import models.Subscription;
+import repository.FavoriteRepo;
 import repository.SubscriptionRepo;
 import utils.EmailUtil;
 
@@ -45,6 +47,27 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     }
 
     @WebMethod
+    public Subscription unsubscribe(int user_id, int album_id, String ipAddress) {
+        try {
+            this.validateAndRecord(user_id, album_id, ipAddress);
+
+            Subscription existingSubscription = SubscriptionRepo.getInstance().findById(user_id, album_id);
+
+            if (existingSubscription != null) {
+                // Subscription exists, delete it
+                SubscriptionRepo.getInstance().delete(existingSubscription);
+                return existingSubscription;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.out.println("exception: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @WebMethod
     public Subscription acceptSubscription(int user_id, int album_id, String ipAddress) {
         try {
             this.validateAndRecord(user_id, album_id, ipAddress);
@@ -75,50 +98,12 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     }
 
     @WebMethod
-    public List<Subscription> getSubscriptions(String ipAddress) {
+    public Subscription verifySubscription(int user_id, int album_id, String ipAddress) {
         try {
-            this.validateAndRecord(ipAddress);
-            return SubscriptionRepo.getInstance().findAll();
-        } catch (Exception e) {
-            System.out.println("exception: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    @WebMethod
-    public List<Subscription> checkStatus(String userIds, String albumIds, String ipAddress) {
-        try {
-            this.validateAndRecord(userIds, albumIds, ipAddress);
-            List<Integer> intuserIds = Arrays
-                    .stream(userIds.split(","))
-                    .map(Integer::parseInt)
-                    .collect(Collectors.toList());
-            List<Integer> intalbumIds = Arrays
-                    .stream(albumIds.split(","))
-                    .map(Integer::parseInt)
-                    .collect(Collectors.toList());
-
-            List<Subscription> result = new ArrayList<>();
-            for (int i=0;i<intuserIds.size() && i < intalbumIds.size();i++) {
-                result.add(SubscriptionRepo.getInstance().findById(
-                        intuserIds.get(i), intalbumIds.get(i))
-                );
-            }
-
-            return result.stream().filter(s -> s != null).collect(Collectors.toList());
-        } catch (Exception e) {
-            System.out.println("exception: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    @WebMethod
-    public List<Subscription> getByStatus(Subscription.SubscriptionStatus status, String ipAddress) {
-        try {
-            this.validateAndRecord(status, ipAddress);
-            return SubscriptionRepo.getInstance().findByStatus(status);
+            this.validateAndRecord(user_id, album_id, ipAddress);
+            Subscription existingSubscription = SubscriptionRepo.getInstance().findById(user_id, album_id);
+            System.out.println(existingSubscription);
+            return existingSubscription;
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
             e.printStackTrace();
