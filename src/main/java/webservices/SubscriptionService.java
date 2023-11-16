@@ -1,9 +1,7 @@
 package webservices;
 
 import lombok.var;
-import models.Favorite;
 import models.Subscription;
-import repository.FavoriteRepo;
 import repository.SubscriptionRepo;
 import utils.EmailUtil;
 
@@ -13,10 +11,7 @@ import javax.mail.internet.AddressException;
 
 import clients.KBLRestClient;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebService
 public class SubscriptionService extends AbstractWebservices implements SubscriptionInterface {

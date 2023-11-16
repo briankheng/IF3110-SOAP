@@ -10,7 +10,7 @@ import java.util.List;
 @WebService
 public class TokenService extends AbstractWebservices implements TokenInterface {
     @WebMethod
-    public Token findByTokenString(String tokenString, String ipAddress) {
+    public Token checkToken(String tokenString, String ipAddress) {
         try {
             this.validateAndRecord(tokenString, ipAddress);
             return TokenRepo.getInstance().findByTokenString(tokenString);

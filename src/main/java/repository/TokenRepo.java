@@ -21,7 +21,7 @@ public class TokenRepo extends RepoInterface<Token> {
         if (instance == null) {
             instance = new TokenRepo(
                     DBInstance.getInstance(),
-                    "tokens");
+                    "token");
         }
         return instance;
     }

@@ -9,7 +9,7 @@ import java.util.List;
 @WebService
 public interface TokenInterface {
     @WebMethod
-    public Token findByTokenString(String tokenString, String ipAddress);
+    public Token checkToken(String tokenString, String ipAddress);
 
     @WebMethod
     public List<Token> getAllTokens(String ipAddress);

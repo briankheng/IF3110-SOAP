@@ -37,7 +37,7 @@ CREATE TABLE `token` (
 
 INSERT INTO `token` (`token_string`, `coin_value`) VALUES
 ('kbl-12345', 100),
-('kbl-23456', 200);
-('kbl-34567', 10);
-('kbl-45678', 20);
+('kbl-23456', 200),
+('kbl-34567', 10),
+('kbl-45678', 20),
 ('kbl-56789', 30);
