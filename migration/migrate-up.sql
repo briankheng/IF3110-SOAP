@@ -27,3 +27,17 @@ CREATE TABLE `favorites` (
   `user_id` int NOT NULL,
   `album_id` int NOT NULL
 );
+
+CREATE TABLE `token` (
+    `token_id` int NOT NULL AUTO_INCREMENT,
+    `token_string` varchar(255) NOT NULL,
+    `coin_value` int NOT NULL,
+    PRIMARY KEY (`token_id`)
+);
+
+INSERT INTO `token` (`token_string`, `coin_value`) VALUES
+('kbl-12345', 100),
+('kbl-23456', 200);
+('kbl-34567', 10);
+('kbl-45678', 20);
+('kbl-56789', 30);
