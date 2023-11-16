@@ -1,7 +1,5 @@
 package utils;
 
-import java.util.Map;
-
 public class ConfigHandler {
     private static ConfigHandler instance = null;
     private PropertiesHandler ph;

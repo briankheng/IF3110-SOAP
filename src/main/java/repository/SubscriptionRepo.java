@@ -96,19 +96,6 @@ public class SubscriptionRepo extends RepoInterface<Subscription> {
     }
 
     @Override
-    public Subscription update(Subscription subscription) throws SQLException {
-        Statement stmt = this.db.getConnection().createStatement();
-        int rs = stmt.executeUpdate(
-            "UPDATE " + this.tableName + 
-            " SET status = '" + subscription.getStatus().toString() + 
-            "' WHERE user_id = " + subscription.getUserId() + " AND album_id = " + subscription.getAlbumId());
-        if (rs > 0) {
-            return this.findById(subscription.getUserId(), subscription.getAlbumId());
-        }
-        return null;
-    }
-
-    @Override
     public Subscription delete(Subscription subscription) throws SQLException {
         Statement stmt = this.db.getConnection().createStatement();
         int rs = stmt.executeUpdate("DELETE FROM " + this.tableName + " WHERE user_id = " + subscription.getUserId() + " AND album_id = " + subscription.getAlbumId());
@@ -118,16 +105,8 @@ public class SubscriptionRepo extends RepoInterface<Subscription> {
         return null;
     }
 
-    public List<Subscription> findByStatus(Subscription.SubscriptionStatus status) throws SQLException {
-        List<Subscription> result = new ArrayList<>();
-
+    public void deleteByAlbumId(int album_id) throws SQLException {
         Statement stmt = this.db.getConnection().createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT * FROM " + this.tableName + " WHERE status = '" + status.toString() + "'");
-        while (rs.next()) {
-            Subscription subscription = new Subscription();
-            subscription.constructFromSQL(rs);
-            result.add(subscription);
-        }
-        return result;
+        stmt.executeUpdate("DELETE FROM " + this.tableName + " WHERE album_id = " + album_id);
     }
 }

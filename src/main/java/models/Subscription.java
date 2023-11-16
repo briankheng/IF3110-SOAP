@@ -17,29 +17,11 @@ import java.sql.SQLException;
 public class Subscription extends ModelInterface {
     private Integer userId;
     private Integer albumId;
-    private SubscriptionStatus status;
-
-    @XmlEnum(String.class)
-    public enum SubscriptionStatus {
-        PENDING,
-        ACCEPTED,
-        REJECTED;
-
-        public static SubscriptionStatus fromStatusCode(String value) {
-            for (SubscriptionStatus status : SubscriptionStatus.values()) {
-                if (status.toString().equalsIgnoreCase(value)) {
-                    return status;
-                }
-            }
-            return null;
-        }
-    }
 
     @Override
     public void constructFromSQL(ResultSet rs) throws SQLException {
         this.userId = rs.getInt("user_id");
         this.albumId = rs.getInt("album_id");
-        this.status = Subscription.SubscriptionStatus.fromStatusCode(rs.getString("status"));
     }
 
     public Integer getUserId() {
@@ -48,18 +30,5 @@ public class Subscription extends ModelInterface {
 
     public Integer getAlbumId() {
         return this.albumId;
-    }
-
-    public Subscription.SubscriptionStatus getStatus() {
-        return this.status;
-    }
-
-    @Override
-    public String toString() {
-        return "Subscription{" +
-                "userId=" + this.userId +
-                ", albumId='" + this.albumId +
-                ", status='" + this.status + '\'' +
-                '}';
     }
 }

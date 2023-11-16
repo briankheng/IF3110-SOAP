@@ -19,8 +19,7 @@ INSERT INTO api_keys VALUES
 
 CREATE TABLE `subscriptions` (
   `user_id` int NOT NULL,
-  `album_id` int NOT NULL,
-  `status` enum('PENDING','REJECTED','ACCEPTED') NOT NULL DEFAULT 'PENDING'
+  `album_id` int NOT NULL
 );
 
 CREATE TABLE `favorites` (

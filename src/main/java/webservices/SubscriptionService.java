@@ -24,13 +24,13 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
             if (existingSubscription != null) {
                 // Subscription already exists, update it
                 this.validateAndRecord(user_id, album_id, ipAddress);
-                Subscription model = new Subscription(user_id, album_id, Subscription.SubscriptionStatus.PENDING);
+                Subscription model = new Subscription(user_id, album_id);
                 var result = SubscriptionRepo.getInstance().update(model);
                 return result;
             } else {
                 // Subscription doesn't exist, create a new one
                 this.validateAndRecord(user_id, album_id, ipAddress);
-                Subscription newSubscription = new Subscription(user_id, album_id, Subscription.SubscriptionStatus.PENDING);
+                Subscription newSubscription = new Subscription(user_id, album_id);
                 var createdSubscription = SubscriptionRepo.getInstance().create(newSubscription);
                 return createdSubscription;
             }
@@ -55,36 +55,6 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
             } else {
                 return null;
             }
-        } catch (Exception e) {
-            System.out.println("exception: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    @WebMethod
-    public Subscription acceptSubscription(int user_id, int album_id, String ipAddress) {
-        try {
-            this.validateAndRecord(user_id, album_id, ipAddress);
-
-            Subscription model = new Subscription(user_id, album_id, Subscription.SubscriptionStatus.ACCEPTED);
-            var result = SubscriptionRepo.getInstance().update(model);
-            return result;
-        } catch (Exception e) {
-            System.out.println("exception: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    @WebMethod
-    public Subscription rejectSubscription(int user_id, int album_id, String ipAddress) {
-        try {
-            this.validateAndRecord(user_id, album_id, ipAddress);
-
-            Subscription model = new Subscription(user_id, album_id, Subscription.SubscriptionStatus.REJECTED);
-            var result = SubscriptionRepo.getInstance().update(model);
-            return result;
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
             e.printStackTrace();
@@ -127,6 +97,18 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
                 }
             }
 
+        } catch (Exception e) {
+            System.out.println("exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @WebMethod
+    public void removeSubscriptionByAlbumId(int album_id, String ipAddress) {
+        try {
+            this.validateAndRecord(album_id, ipAddress);
+
+            SubscriptionRepo.getInstance().deleteByAlbumId(album_id);
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
             e.printStackTrace();

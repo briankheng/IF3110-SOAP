@@ -11,14 +11,11 @@ public interface SubscriptionInterface {
     public Subscription subscribe(int user_id, int album_id, String ipAddress);
 
     @WebMethod
-    public Subscription acceptSubscription(int user_id, int album_id, String ipAddress);
-
-    @WebMethod
-    public Subscription rejectSubscription(int user_id, int album_id, String ipAddress);
-
-    @WebMethod
-    public Subscription verifySubscription(int user_id, int album_id, String ipAddress);
+    public Subscription unsubscribe(int user_id, int album_id, String ipAddress);
 
     @WebMethod
     public void notifySubscriber(int album_id, String album_name, String ipAddress);
+
+    @WebMethod
+    public void removeSubscriptionByAlbumId(int album_id, String ipAdress);
 }
