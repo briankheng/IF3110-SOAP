@@ -42,23 +42,15 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
     }
 
     @WebMethod
-    public Subscription unsubscribe(int user_id, int album_id, String ipAddress) {
+    public void unsubscribe(int user_id, int album_id, String ipAddress) {
         try {
             this.validateAndRecord(user_id, album_id, ipAddress);
 
             Subscription existingSubscription = SubscriptionRepo.getInstance().findById(user_id, album_id);
-
-            if (existingSubscription != null) {
-                // Subscription exists, delete it
-                SubscriptionRepo.getInstance().delete(existingSubscription);
-                return existingSubscription;
-            } else {
-                return null;
-            }
+            SubscriptionRepo.getInstance().delete(existingSubscription);
         } catch (Exception e) {
             System.out.println("exception: " + e.getMessage());
             e.printStackTrace();
-            return null;
         }
     }
 
@@ -82,18 +74,21 @@ public class SubscriptionService extends AbstractWebservices implements Subscrip
             this.validateAndRecord(album_id, ipAddress);
             // Get all the user ids of subscribed album
             List<Integer> userIds = SubscriptionRepo.getInstance().findUserByAlbumId(album_id);
-            // Get all the user emails based on user ids
-            String[] emails = KBLRestClient.getInstance().getUserEmails(userIds);
-            // Notify by sending emails to them
-            for (int i = 0; i < emails.length; i++) {
-                try {
-                    System.out.println("Sending email to " + emails[i]);
-                    EmailUtil.getInstance().send(emails[i], "New Video is Recently Uploaded!",
-                    "There is new video from your subscribed album, " + album_name + ", Go check it out!");
-                    System.out.println("Successfully send email to " + emails[i]);
-                } catch (AddressException ex) {
-                    System.out.println("Failed to send email to " + emails[i]);
-                    ex.printStackTrace();
+
+            if (userIds != null) {
+                // Get all the user emails based on user ids
+                String[] emails = KBLRestClient.getInstance().getUserEmails(userIds);
+                // Notify by sending emails to them
+                for (int i = 0; i < emails.length; i++) {
+                    try {
+                        System.out.println("Sending email to " + emails[i]);
+                        EmailUtil.getInstance().send(emails[i], "New Video is Recently Uploaded!",
+                        "There is new video from your subscribed album, " + album_name + ", Go check it out!");
+                        System.out.println("Successfully send email to " + emails[i]);
+                    } catch (AddressException ex) {
+                        System.out.println("Failed to send email to " + emails[i]);
+                        ex.printStackTrace();
+                    }
                 }
             }
 

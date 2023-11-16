@@ -11,7 +11,7 @@ public interface SubscriptionInterface {
     public Subscription subscribe(int user_id, int album_id, String ipAddress);
 
     @WebMethod
-    public Subscription unsubscribe(int user_id, int album_id, String ipAddress);
+    public void unsubscribe(int user_id, int album_id, String ipAddress);
 
     @WebMethod
     public void notifySubscriber(int album_id, String album_name, String ipAddress);
