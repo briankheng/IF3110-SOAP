@@ -67,4 +67,16 @@ public class FavoriteService extends AbstractWebservices implements FavoriteInte
             return null;
         }
     }
+
+    @WebMethod
+    public void removeFavoritesByAlbumId(int album_id, String ipAddress) {
+        try {
+            this.validateAndRecord(album_id, ipAddress);
+
+            FavoriteRepo.getInstance().deleteByAlbumId(album_id);
+        } catch (Exception e) {
+            System.out.println("exception: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

@@ -16,4 +16,7 @@ public interface FavoriteInterface {
 
     @WebMethod
     public Favorite removeFavorite(int user_id, int album_id, String ipAddress);
+
+    @WebMethod
+    public void removeFavoritesByAlbumId(int album_id, String ipAddress);
 }

@@ -75,4 +75,9 @@ public class FavoriteRepo extends RepoInterface<Favorite> {
 
         return favorite;
     }
+
+    public void deleteByAlbumId(int album_id) throws SQLException {
+        Statement stmt = this.db.getConnection().createStatement();
+        stmt.executeUpdate("DELETE FROM " + this.tableName + " WHERE album_id = " + album_id);
+    }
 }
