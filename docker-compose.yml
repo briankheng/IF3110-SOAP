@@ -22,6 +22,8 @@ services:
       - "3003:3003"
     env_file:
       - .env
+    networks:
+      - mynetwork 
 
   database:
     container_name: soap-db
@@ -34,3 +36,9 @@ services:
       - .env
     ports:
       - "9902:3306"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
